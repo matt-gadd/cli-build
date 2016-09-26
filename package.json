@@ -18,6 +18,7 @@
   },
   "devDependencies": {
     "codecov.io": "0.1.6",
+    "dojo-cli": "^2.0.0-alpha.3",
     "dojo-loader": ">=2.0.0-beta.7",
     "dts-generator": "~1.7.0",
     "glob": "^7.0.3",
@@ -32,6 +33,7 @@
     "yargs": "^5.0.0"
   },
   "dependencies": {
+    "@types/es6-promise": "0.0.32",
     "copy-webpack-plugin": "^3.0.1",
     "html-webpack-plugin": "^2.22.0",
     "ts-loader": "^0.8.2",
