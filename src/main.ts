@@ -60,7 +60,7 @@ const command: Command = {
 
 		helper.yargs.options('p', {
 			alias: 'port',
-			describe: 'port to serve on when using --serve',
+			describe: 'port to serve on when using --watch',
 			type: 'number'
 		});
 
