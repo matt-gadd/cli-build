@@ -1,9 +1,53 @@
 import { Command, Helper } from 'dojo-cli/interfaces';
 import { Argv } from 'yargs';
+import { join } from 'path';
+const webpack: any = require('webpack');
+const WebpackDevServer: any = require('webpack-dev-server');
+const config: any = require('./webpack.config.prod.js');
 
 export interface BuildArgs extends Argv {
 	watch: boolean;
 	port: number;
+}
+
+export interface WebpackOptions {
+	stats: {
+		colors: boolean
+		chunks: boolean
+	};
+}
+
+function watch(config: any, options: WebpackOptions, args: BuildArgs): Promise<any> {
+	config.devtool = 'eval-source-map';
+	config.entry.unshift(join(__dirname, 'node_modules', 'webpack-dev-server/client?'));
+
+	const compiler = webpack(config);
+	const server = new WebpackDevServer(compiler, options);
+
+	return new Promise((resolve, reject) => {
+		const port = args.port || 9999;
+		server.listen(port, '127.0.0.1', (err: Error) => {
+			console.log(`Starting server on http://localhost:${port}`);
+			if (err) {
+				reject(err);
+				return;
+			}
+		});
+	});
+}
+
+function compile(config: any, options: WebpackOptions): Promise<any> {
+	const compiler = webpack(config);
+	return new Promise((resolve, reject) => {
+		compiler.run((err: any, stats: any) => {
+			if (err) {
+				reject(err);
+				return;
+			}
+			console.log(stats.toString(options.stats));
+			resolve({});
+		});
+	});
 }
 
 const command: Command = {
@@ -23,12 +67,7 @@ const command: Command = {
 		return helper.yargs;
 	},
 	run(helper: Helper, args: BuildArgs) {
-		const webpack: any = require('webpack');
-		const path: any = require('path');
-		const WebpackDevServer: any = require('webpack-dev-server');
-		const config: any = require('./webpack.config.prod.js');
-
-		const options = {
+		const options: WebpackOptions = {
 			stats: {
 				colors: true,
 				chunks: false
@@ -36,36 +75,9 @@ const command: Command = {
 		};
 
 		if (args.watch) {
-			config.devtool = 'eval-source-map';
-			config.entry.unshift(path.join(__dirname, 'node_modules', 'webpack-dev-server/client?'));
-		}
-
-		const compiler = webpack(config);
-
-		if (args.watch) {
-			const server = new WebpackDevServer(compiler, options);
-
-			return new Promise((resolve, reject) => {
-				const port = args.port || 9999;
-				server.listen(port, '127.0.0.1', (err: Error) => {
-					console.log(`Starting server on http://localhost:${port}`);
-					if (err) {
-						reject(err);
-						return;
-					}
-				});
-			});
+			return watch(config, options, args);
 		} else {
-			return new Promise((resolve, reject) => {
-				compiler.run((err: any, stats: any) => {
-					if (err) {
-						reject(err);
-						return;
-					}
-					console.log(stats.toString(options.stats));
-					resolve({});
-				});
-			});
+			return compile(config, options);
 		}
 	}
 };
