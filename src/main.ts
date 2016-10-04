@@ -11,6 +11,7 @@ export interface BuildArgs extends Argv {
 }
 
 export interface WebpackOptions {
+	compress: boolean;
 	stats: {
 		colors: boolean
 		chunks: boolean
@@ -68,6 +69,7 @@ const command: Command = {
 	},
 	run(helper: Helper, args: BuildArgs) {
 		const options: WebpackOptions = {
+			compress: true,
 			stats: {
 				colors: true,
 				chunks: false
