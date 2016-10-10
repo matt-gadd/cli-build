@@ -1,7 +1,8 @@
 module.exports = function (grunt) {
 	require('grunt-dojo2').initConfig(grunt, {
 		copy: {
-			webpack: { src: 'src/webpack.config.prod.js', dest: 'dist/umd/webpack.config.prod.js' }
+			staticDistFiles: { src: 'src/webpack.config.prod.js', dest: 'dist/umd/webpack.config.prod.js' },
+			staticDevFiles: { src: 'src/webpack.config.prod.js', dest: '_build/src/webpack.config.prod.js' }
 		}
 	});
 
@@ -9,5 +10,6 @@ module.exports = function (grunt) {
 		'intern:node'
 	]);
 
-	grunt.registerTask('dist', grunt.config.get('distTasks').concat(['copy:webpack']));
+	grunt.registerTask('dist', grunt.config.get('distTasks').concat(['copy:staticDistFiles']));
+	grunt.registerTask('dev', grunt.config.get('devTasks').concat(['copy:staticDevFiles']));
 };

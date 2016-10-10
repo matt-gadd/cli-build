@@ -3,7 +3,7 @@ import { Argv } from 'yargs';
 import { join } from 'path';
 const webpack: any = require('webpack');
 const WebpackDevServer: any = require('webpack-dev-server');
-const config: any = require('./webpack.config.prod.js');
+const config: any = require('./webpack.config.prod');
 
 export interface BuildArgs extends Argv {
 	watch: boolean;
@@ -83,5 +83,4 @@ const command: Command = {
 		}
 	}
 };
-
 export default command;
