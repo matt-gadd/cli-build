@@ -5,12 +5,12 @@ const webpack: any = require('webpack');
 const WebpackDevServer: any = require('webpack-dev-server');
 const config: any = require('./webpack.config.prod');
 
-export interface BuildArgs extends Argv {
+interface BuildArgs extends Argv {
 	watch: boolean;
 	port: number;
 }
 
-export interface WebpackOptions {
+interface WebpackOptions {
 	compress: boolean;
 	stats: {
 		colors: boolean
