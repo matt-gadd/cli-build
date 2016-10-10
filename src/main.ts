@@ -53,7 +53,7 @@ function compile(config: any, options: WebpackOptions): Promise<any> {
 
 const command: Command = {
 	description: 'create a build of your application',
-	register(helper) {
+	register(helper: Helper) {
 		helper.yargs.option('w', {
 			alias: 'watch',
 			describe: 'watch and serve'
