@@ -37,7 +37,7 @@ export default class MockModule {
 		this.mocks = {};
 	}
 
-	dependencies(dependencies: string[]) {
+	dependencies(dependencies: string[]): void {
 		dependencies.forEach((dependencyName) => {
 			let dependency = load(resolvePath(this.basePath, dependencyName));
 			const mock: any = {};
@@ -72,7 +72,7 @@ export default class MockModule {
 		return load(this.moduleUnderTestPath);
 	}
 
-	destroy() {
+	destroy(): void {
 		unload(this.moduleUnderTestPath);
 		this.sandbox.restore();
 		mockery.deregisterAll();
