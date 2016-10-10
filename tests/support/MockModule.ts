@@ -56,7 +56,6 @@ export default class MockModule {
 			} else {
 				mockery.registerMock(dependencyName, mock);
 			}
-			mock.time = Date.now();
 			this.mocks[dependencyName] = mock;
 		});
 	}
