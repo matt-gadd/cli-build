@@ -32,13 +32,13 @@ describe('main', () => {
 	it('should register supported arguments', () => {
 		const helper = { yargs: { option: sandbox.stub() } };
 		moduleUnderTest.register(helper);
-		assert.notStrictEqual(
+		assert.deepEqual(
 			helper.yargs.option.firstCall.args,
 			[ 'w', { alias: 'watch', describe: 'watch and serve' } ]
 		);
-		assert.notStrictEqual(
+		assert.deepEqual(
 			helper.yargs.option.secondCall.args,
-			[ 'p', { alias: 'port', describe: 'port to server on when using --watch', type: 'number' }],
+			[ 'p', { alias: 'port', describe: 'port to serve on when using --watch', type: 'number' }],
 		);
 	});
 
@@ -70,7 +70,7 @@ describe('main', () => {
 			assert.isTrue(mockWebpackDevServer.listen.calledOnce);
 			assert.isTrue((<sinon.SinonStub> console.log).firstCall.calledWith('Starting server on http://localhost:9999'));
 			assert.equal(mockWebpackConfig.devtool, 'eval-source-map');
-			assert.notStrictEqual(
+			assert.deepEqual(
 				mockWebpackConfig.entry,
 				[join(require.toUrl('src'), 'node_modules', 'webpack-dev-server/client?')]
 			);
