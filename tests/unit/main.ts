@@ -1,7 +1,7 @@
 import { join } from 'path';
 import { beforeEach, afterEach, describe, it } from 'intern!bdd';
 import * as assert from 'intern/chai!assert';
-import MockModule from '../support/util';
+import MockModule from '../support/MockModule';
 import * as sinon from 'sinon';
 
 describe('main', () => {
