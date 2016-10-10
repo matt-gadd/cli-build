@@ -1,9 +1,10 @@
+import { join } from 'path';
 import { beforeEach, afterEach, describe, it } from 'intern!bdd';
 import * as assert from 'intern/chai!assert';
 import MockModule from '../support/util';
 import * as sinon from 'sinon';
 
-describe('it should do something', () => {
+describe('main', () => {
 
 	let moduleUnderTest: any;
 	let mockModule: MockModule;
@@ -62,13 +63,18 @@ describe('it should do something', () => {
 		);
 	});
 
-	it('should run watch', () => {
+	it('should run watch, setting appropriate webpack options', () => {
 		const mockWebpackDevServer = mockModule.getMock('webpack-dev-server');
 		mockWebpackDevServer.listen = sandbox.stub().yields();
 		moduleUnderTest.run({}, { watch: true });
 		return new Promise((resolve) => setTimeout(resolve, 10)).then(() => {
 			assert.isTrue(mockWebpackDevServer.listen.calledOnce);
 			assert.isTrue((<sinon.SinonStub> console.log).firstCall.calledWith('Starting server on http://localhost:9999'));
+			assert.equal(mockWebpackConfig.devtool, 'eval-source-map');
+			assert.notStrictEqual(
+				mockWebpackConfig.entry,
+				[join(require.toUrl('src'), 'node_modules', 'webpack-dev-server/client?')]
+			);
 		});
 	});
 
