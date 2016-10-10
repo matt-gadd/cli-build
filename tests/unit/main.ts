@@ -29,17 +29,15 @@ describe('it should do something', () => {
 
 	it('should run compile and log results on success', () => {
 		mockWebpack.run = sandbox.stub().yields(false, 'some stats');
-
 		return moduleUnderTest.run({}, {}).then(() => {
 			assert.isTrue(mockWebpack.run.calledOnce);
-			assert.isTrue((<any> console.log).calledWith('some stats'));
+			assert.isTrue((<sinon.SinonStub> console.log).calledWith('some stats'));
 		});
 	});
 
 	it('should run compile and reject on failure', () => {
 		const compilerError = new Error('compiler error');
 		mockWebpack.run = sandbox.stub().yields(compilerError, null);
-
 		return moduleUnderTest.run({}, {}).then(
 			() => {
 				throw new Error('unexpected path');
@@ -51,11 +49,20 @@ describe('it should do something', () => {
 		);
 	});
 
+	it('should run watch', () => {
+		const mockWebpackDevServer = mockModule.getMock('webpack-dev-server');
+		mockWebpackDevServer.listen = sandbox.stub().yields();
+		moduleUnderTest.run({}, { watch: true });
+		return new Promise((resolve) => setTimeout(resolve, 10)).then(() => {
+			assert.isTrue(mockWebpackDevServer.listen.calledOnce);
+			assert.isTrue((<sinon.SinonStub> console.log).firstCall.calledWith('Starting server on http://localhost:9999'));
+		});
+	});
+
 	it('should run watch and reject on failure', () => {
 		const compilerError = new Error('compiler error');
 		const mockWebpackDevServer = mockModule.getMock('webpack-dev-server');
 		mockWebpackDevServer.listen = sandbox.stub().yields(compilerError);
-
 		return moduleUnderTest.run({}, { watch: true }).then(
 			() => {
 				throw new Error('unexpected path');
