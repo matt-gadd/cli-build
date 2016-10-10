@@ -16,9 +16,9 @@ describe('main', () => {
 	beforeEach(() => {
 		sandbox = sinon.sandbox.create();
 		mockModule = new MockModule('../../src/main');
-		mockModule.dependencies(['./webpack.config.prod', 'webpack', 'webpack-dev-server']);
+		mockModule.dependencies(['./webpack.config', 'webpack', 'webpack-dev-server']);
 		mockWebpack = mockModule.getMock('webpack');
-		mockWebpackConfig = mockModule.getMock('./webpack.config.prod');
+		mockWebpackConfig = mockModule.getMock('./webpack.config');
 		mockWebpackConfig.entry = [];
 		moduleUnderTest = mockModule.getModuleUnderTest().default;
 		sandbox.stub(console, 'log');
