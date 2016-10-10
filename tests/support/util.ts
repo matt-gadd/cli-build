@@ -8,26 +8,30 @@ function load(modulePath: string): any {
 	return require(mid);
 }
 
-function unload(modulePath: string): any {
+function unload(modulePath: string): void {
 	const abs = require.toUrl(modulePath);
 	const plugin = require.toAbsMid(dojoNodePlugin);
 	require.undef(`${plugin}!${abs}`);
 }
 
 function resolvePath(basePath: string, modulePath: string): string {
-	if (modulePath.indexOf('./') === 0) {
-		modulePath = modulePath.replace('./', '');
-		return `../../src/${modulePath}`;
-	}
-	return modulePath;
+	return modulePath.replace('./', `${basePath}/`);
+}
+
+function getBasePath(modulePath: string): string {
+	const chunks = modulePath.split('/');
+	chunks.pop();
+	return chunks.join('/');
 }
 
 export default class MockModule {
+	private basePath: string;
 	private moduleUnderTestPath: string;
 	private mocks: any;
 	private sandbox: sinon.SinonSandbox;
 
 	constructor(moduleUnderTestPath: string) {
+		this.basePath = getBasePath(moduleUnderTestPath);
 		this.moduleUnderTestPath = moduleUnderTestPath;
 		this.sandbox = sinon.sandbox.create();
 		this.mocks = {};
@@ -35,7 +39,7 @@ export default class MockModule {
 
 	dependencies(dependencies: string[]) {
 		dependencies.forEach((dependencyName) => {
-			let dependency = load(resolvePath(this.moduleUnderTestPath, dependencyName));
+			let dependency = load(resolvePath(this.basePath, dependencyName));
 			const mock: any = {};
 
 			for (let prop in dependency) {
