@@ -2,6 +2,7 @@ import { join } from 'path';
 import { beforeEach, afterEach, describe, it } from 'intern!bdd';
 import * as assert from 'intern/chai!assert';
 import MockModule from '../support/MockModule';
+import { throwImmediatly } from '../support/util';
 import * as sinon from 'sinon';
 
 describe('main', () => {
@@ -53,9 +54,7 @@ describe('main', () => {
 		const compilerError = new Error('compiler error');
 		mockWebpack.run = sandbox.stub().yields(compilerError, null);
 		return moduleUnderTest.run({}, {}).then(
-			() => {
-				throw new Error('unexpected path');
-			},
+			throwImmediatly,
 			(e: Error) => {
 				assert.isTrue(mockWebpack.run.calledOnce);
 				assert.equal(e, compilerError);
@@ -83,9 +82,7 @@ describe('main', () => {
 		const mockWebpackDevServer = mockModule.getMock('webpack-dev-server');
 		mockWebpackDevServer.listen = sandbox.stub().yields(compilerError);
 		return moduleUnderTest.run({}, { watch: true }).then(
-			() => {
-				throw new Error('unexpected path');
-			},
+			throwImmediatly,
 			(e: Error) => {
 				assert.isTrue(mockWebpackDevServer.listen.calledOnce);
 				assert.equal(e, compilerError);
