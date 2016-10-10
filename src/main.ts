@@ -59,7 +59,7 @@ const command: Command = {
 			describe: 'watch and serve'
 		});
 
-		helper.yargs.options('p', {
+		helper.yargs.option('p', {
 			alias: 'port',
 			describe: 'port to serve on when using --watch',
 			type: 'number'

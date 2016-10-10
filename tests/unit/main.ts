@@ -27,6 +27,19 @@ describe('it should do something', () => {
 		mockModule.destroy();
 	});
 
+	it('should register supported arguments', () => {
+		const helper = { yargs: { option: sandbox.stub() } };
+		moduleUnderTest.register(helper);
+		assert.notStrictEqual(
+			helper.yargs.option.firstCall.args,
+			[ 'w', { alias: 'watch', describe: 'watch and serve' } ]
+		);
+		assert.notStrictEqual(
+			helper.yargs.option.secondCall.args,
+			[ 'p', { alias: 'port', describe: 'port to server on when using --watch', type: 'number' }],
+		);
+	});
+
 	it('should run compile and log results on success', () => {
 		mockWebpack.run = sandbox.stub().yields(false, 'some stats');
 		return moduleUnderTest.run({}, {}).then(() => {
