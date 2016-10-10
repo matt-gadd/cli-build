@@ -1,10 +1,17 @@
 import * as mockery from 'mockery';
 import * as sinon from 'sinon';
 
+const dojoNodePlugin = 'intern/dojo/node';
+
 function load(modulePath: string): any {
-	const dojoNode = 'intern/dojo/node!';
-	const mid = `${dojoNode}${modulePath}`;
+	const mid = `${dojoNodePlugin}!${modulePath}`;
 	return require(mid);
+}
+
+function unload(modulePath: string): any {
+	const abs = require.toUrl(modulePath);
+	const plugin = require.toAbsMid(dojoNodePlugin);
+	require.undef(`${plugin}!${abs}`);
 }
 
 function resolvePath(basePath: string, modulePath: string): string {
@@ -62,9 +69,7 @@ export default class MockModule {
 	}
 
 	destroy() {
-		const abs = require.toUrl(this.moduleUnderTestPath);
-		const plugin = require.toAbsMid('intern/dojo/node');
-		require.undef(`${plugin}!${abs}`);
+		unload(this.moduleUnderTestPath);
 		this.sandbox.restore();
 		mockery.deregisterAll();
 		mockery.disable();
