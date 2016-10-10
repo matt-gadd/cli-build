@@ -53,7 +53,8 @@ export default class MockModule {
 				const ctor = this.sandbox.stub().returns(mock);
 				mockery.registerMock(dependencyName, ctor);
 				mock.ctor = ctor;
-			} else {
+			}
+			else {
 				mockery.registerMock(dependencyName, mock);
 			}
 			this.mocks[dependencyName] = mock;
