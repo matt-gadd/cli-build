@@ -8,17 +8,17 @@ const basePath = process.cwd();
 
 module.exports = {
 	entry: {
-		'src/main': [
-			path.join(basePath, 'src/main.styl'),
-			path.join(basePath, 'src/main.ts')
-		]
+		'src/main': [ path.join(basePath, 'src/main.ts'), path.join(basePath, 'src/main.styl') ],
+		'tests/unit/all': [ path.join(basePath, 'tests/unit/all.ts') ],
+		'tests/functional/all': [ path.join(basePath, 'tests/functional/all.ts') ]
 	},
 	devtool: 'source-map',
 	resolve: {
 		root: [ basePath ],
 		extensions: ['', '.ts', '.tsx', '.js'],
 		alias: {
-			rxjs: '@reactivex/rxjs/dist/amd'
+			rxjs: '@reactivex/rxjs/dist/amd',
+			intern: path.join(__dirname, 'intern')
 		}
 	},
 	resolveLoader: {
@@ -36,7 +36,7 @@ module.exports = {
 			}
 		],
 		loaders: [
-			{ test: /src\/.*\.ts?$/, loader: 'ts-loader' },
+			{ test: /[src|test]\/.*\.ts?$/, loader: 'ts-loader' }
 			{ test: /\.html$/, loader: "html" },
 			{ test: /\.(jpe|jpg|woff|woff2|eot|ttf|svg)(\?.*$|$)/, loader: 'file' },
 			{ test: /\.styl$/, loader: ExtractTextPlugin.extract(['css-loader?sourceMap', 'stylus-loader']) }
@@ -46,6 +46,7 @@ module.exports = {
 		new ExtractTextPlugin('main.css'),
 		new CopyWebpackPlugin([
 			{ context: 'src', from: '**/*', ignore: '*.ts' },
+			{ context: 'test', from: '**/*', ignore: '*.ts' },
 		]),
 		new RequirePlugin(),
 		new webpack.optimize.DedupePlugin(),
