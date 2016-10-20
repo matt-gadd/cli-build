@@ -18,7 +18,9 @@ describe('main', () => {
 		mockModule.dependencies(['./webpack.config', 'webpack', 'webpack-dev-server']);
 		mockWebpack = mockModule.getMock('webpack');
 		mockWebpackConfig = mockModule.getMock('./webpack.config');
-		mockWebpackConfig.entry = [];
+		mockWebpackConfig.entry = {
+			'src/main': []
+		};
 		moduleUnderTest = mockModule.getModuleUnderTest().default;
 		sandbox.stub(console, 'log');
 	});
@@ -71,7 +73,7 @@ describe('main', () => {
 			assert.equal(mockWebpackConfig.devtool, 'eval-source-map');
 			assert.deepEqual(
 				mockWebpackConfig.entry,
-				['webpack-dev-server/client?']
+				{ 'src/main': ['webpack-dev-server/client?'] }
 			);
 		});
 	});
