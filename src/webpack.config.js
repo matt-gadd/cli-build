@@ -8,19 +8,16 @@ const basePath = process.cwd();
 module.exports = {
 	entry: {
 		'src/main': [
-			path.join(basePath, 'src/styles/stylus/app.styl'),
+			path.join(basePath, 'src/app.styl'),
 			path.join(basePath, 'src/main.ts')
-		],
-		/*'tests/unit/all': [ path.join(basePath, 'tests/unit/all.ts') ],
-		'tests/functional/all': [ path.join(basePath, 'tests/functional/all.ts') ]*/
+		]
 	},
 	devtool: 'source-map',
 	resolve: {
 		root: [ basePath ],
 		extensions: ['', '.ts', '.tsx', '.js'],
 		alias: {
-			rxjs: '@reactivex/rxjs/dist/amd',
-			intern: path.join(__dirname, 'intern')
+			rxjs: '@reactivex/rxjs/dist/amd'
 		}
 	},
 	resolveLoader: {
