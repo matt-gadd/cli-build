@@ -15,6 +15,7 @@ interface WebpackOptions {
 	stats: {
 		colors: boolean
 		chunks: boolean
+		errorDetails: boolean
 	};
 }
 
@@ -72,7 +73,8 @@ const command: Command = {
 			compress: true,
 			stats: {
 				colors: true,
-				chunks: false
+				chunks: false,
+				errorDetails: true
 			}
 		};
 
