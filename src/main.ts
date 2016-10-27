@@ -6,6 +6,7 @@ const config: any = require('./webpack.config');
 
 interface BuildArgs extends Argv {
 	watch: boolean;
+	test: boolean;
 	port: number;
 }
 
@@ -23,7 +24,7 @@ function watch(config: any, options: WebpackOptions, args: BuildArgs): Promise<a
 		config.entry[key].unshift('webpack-dev-server/client?');
 	});
 
-	const compiler = webpack(config);
+	const compiler = webpack(config({ test: args.test }));
 	const server = new WebpackDevServer(compiler, options);
 
 	return new Promise((resolve, reject) => {
@@ -38,8 +39,9 @@ function watch(config: any, options: WebpackOptions, args: BuildArgs): Promise<a
 	});
 }
 
-function compile(config: any, options: WebpackOptions): Promise<any> {
-	const compiler = webpack(config);
+function compile(config: any, options: WebpackOptions, args: BuildArgs): Promise<any> {
+	console.log(args);
+	const compiler = webpack(config({ test: args.test }));
 	return new Promise((resolve, reject) => {
 		compiler.run((err: any, stats: any) => {
 			if (err) {
@@ -58,6 +60,11 @@ const command: Command = {
 		helper.yargs.option('w', {
 			alias: 'watch',
 			describe: 'watch and serve'
+		});
+
+		helper.yargs.option('t', {
+			alias: 'test',
+			describe: 'include test files. when watching, tests will automatically run'
 		});
 
 		helper.yargs.option('p', {
@@ -81,7 +88,7 @@ const command: Command = {
 			return watch(config, options, args);
 		}
 		else {
-			return compile(config, options);
+			return compile(config, options, args);
 		}
 	}
 };
