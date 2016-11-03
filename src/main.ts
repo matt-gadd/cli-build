@@ -18,13 +18,32 @@ interface WebpackOptions {
 	};
 }
 
-function watch(config: any, options: WebpackOptions, args: BuildArgs): Promise<any> {
-	config.devtool = 'eval-source-map';
-	Object.keys(config.entry).forEach((key) => {
-		config.entry[key].unshift('webpack-dev-server/client?');
-	});
+function runTests(stats: any, helper: Helper) {
+	if (helper.command.exists('test')) {
+		const args = { functional: true };
+		return helper.command.run('test', undefined, <any> args);
+	} else {
+		console.log('no test command found');
+	}
+}
 
-	const compiler = webpack(config({ test: args.test }));
+function watch(config: any, options: WebpackOptions, args: BuildArgs, helper: Helper): Promise<any> {
+	config.devtool = 'eval-source-map';
+
+	const webpackConfig = config({ test: args.test });
+
+	webpackConfig.entry['src/main'].unshift('webpack-dev-server/client?');
+	console.log(webpackConfig.entry);
+
+	if (args.test) {
+		webpackConfig.plugins.push({
+			apply: (compiler: any) => {
+				compiler.plugin('done', (stats: any) => runTests(stats, helper));
+			}
+		});
+	}
+
+	const compiler = webpack(webpackConfig);
 	const server = new WebpackDevServer(compiler, options);
 
 	return new Promise((resolve, reject) => {
@@ -39,9 +58,16 @@ function watch(config: any, options: WebpackOptions, args: BuildArgs): Promise<a
 	});
 }
 
-function compile(config: any, options: WebpackOptions, args: BuildArgs): Promise<any> {
-	console.log(args);
-	const compiler = webpack(config({ test: args.test }));
+function compile(config: any, options: WebpackOptions, args: BuildArgs, helper: Helper): Promise<any> {
+	const webpackConfig = config({ test: args.test });
+	if (args.test) {
+		webpackConfig.plugins.push({
+			apply: (compiler: any) => {
+				compiler.plugin('done', (stats: any) => runTests(stats, helper));
+			}
+		});
+	}
+	const compiler = webpack(webpackConfig);
 	return new Promise((resolve, reject) => {
 		compiler.run((err: any, stats: any) => {
 			if (err) {
@@ -49,7 +75,12 @@ function compile(config: any, options: WebpackOptions, args: BuildArgs): Promise
 				return;
 			}
 			console.log(stats.toString(options.stats));
-			resolve({});
+			if (args.test) {
+				return runTests(stats, helper);
+			}
+			else {
+				resolve();
+			}
 		});
 	});
 }
@@ -85,10 +116,10 @@ const command: Command = {
 		};
 
 		if (args.watch) {
-			return watch(config, options, args);
+			return watch(config, options, args, helper);
 		}
 		else {
-			return compile(config, options, args);
+			return compile(config, options, args, helper);
 		}
 	}
 };

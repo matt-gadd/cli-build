@@ -7,39 +7,39 @@ const fs = require('fs');
 const path = require('path');
 const basePath = process.cwd();
 
-
 function isTestEntry(entry) {
 	return entry.indexOf('tests/') === 0;
 }
 
-function include(args, entries) {
-	args = args || {};
-	console.log(args);
-	const r = Object.keys(entries)
-		.filter((entry) => {
-			if (isTestEntry(entry) && !args.test) {
-				return false;
-			}
-			return true;
-		})
-		.reduce((result, entry) => {
-			let deps = entries[entry];
-			deps = deps.filter((dep) => fs.existsSync(dep));
-			if (deps.length) {
-				result[entry] = deps;
-			}
-			return result;
-		}, {});
-	console.log(r);
-	return r;
+function filterEntries(args, entries) {
+	return Object.keys(entries)
+	.filter((entry) => {
+		if (isTestEntry(entry) && !args.test) {
+			return false;
+		}
+		return true;
+	})
+	.reduce((result, entry) => {
+		let deps = entries[entry];
+		deps = deps.filter((dep) => fs.existsSync(dep));
+		if (deps.length) {
+			result[entry] = deps;
+		}
+		return result;
+	}, {});
+}
+
+function tsLoader(args) {
+	const regex = args.test ? /[src|test]\/.*\.ts?$/ : /src\/.*\.ts?$/;
+	return { test: regex, loader: 'ts-loader' };
 }
 
 module.exports = function (args) {
+	args = args || {};
 	return {
-		entry: include(args, {
+		entry: filterEntries(args, {
 			'src/main': [ path.join(basePath, 'src/main.ts'), path.join(basePath, 'src/main.styl') ],
-			'tests/unit/all': [ path.join(basePath, 'tests/unit/all.ts') ],
-			'tests/functional/all': [ path.join(basePath, 'tests/functional/all.ts') ]
+			'tests/unit/all': [ path.join(basePath, 'tests/unit/all.ts') ]
 		}),
 		devtool: 'source-map',
 		resolve: {
@@ -65,7 +65,7 @@ module.exports = function (args) {
 				}
 			],
 			loaders: [
-				{ test: /[src|test]\/.*\.ts?$/, loader: 'ts-loader' },
+				tsLoader(args),
 				{ test: /\.html$/, loader: "html" },
 				{ test: /\.(jpe|jpg|woff|woff2|eot|ttf|svg)(\?.*$|$)/, loader: 'file' },
 				{ test: /\.styl$/, loader: ExtractTextPlugin.extract(['css-loader?sourceMap', 'stylus-loader']) }
