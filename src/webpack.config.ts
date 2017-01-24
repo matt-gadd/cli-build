@@ -21,7 +21,7 @@ module.exports = function (args: any) {
 	args = args || {};
 
 	function includeWhen(predicate: boolean, callback: any) {
-		return predicate ? callback(args) : null;
+		return predicate ? callback(args) : [];
 	}
 
 	return {
