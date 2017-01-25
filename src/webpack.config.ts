@@ -40,8 +40,8 @@ module.exports = function (args: any) {
 			],
 			...includeWhen(args.withTests, (args: any) => {
 				return {
-					'../_build/tests/unit/all': path.join(basePath, 'tests/unit/all.ts'),
-					'../_build/tests/functional/all': path.join(basePath, 'tests/functional/all.ts'),
+					'../_build/tests/unit/all': [ path.join(basePath, 'tests/unit/all.ts') ],
+					'../_build/tests/functional/all': [ path.join(basePath, 'tests/functional/all.ts') ],
 					'../_build/src/main': [
 						path.join(basePath, 'src/main.css'),
 						path.join(basePath, 'src/main.ts')
