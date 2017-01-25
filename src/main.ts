@@ -109,6 +109,11 @@ const command: Command = {
 			type: 'array'
 		});
 
+		helper.yargs.option('c', {
+			alias: 'custom-element',
+			describe: 'build a custom element'
+		});
+
 		return helper.yargs;
 	},
 	run(helper: Helper, args: BuildArgs) {

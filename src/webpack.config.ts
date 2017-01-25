@@ -47,6 +47,11 @@ module.exports = function (args: any) {
 						path.join(basePath, 'src/main.ts')
 					]
 				};
+			}),
+			...includeWhen(args.customElement, (args: any) => {
+				return {
+					'widget-core': [ path.join(basePath, 'node_modules/@dojo/widgets/createWidgetBase') ]
+				};
 			})
 		},
 		plugins: [
@@ -96,6 +101,11 @@ module.exports = function (args: any) {
 						template: 'src/index.html',
 						filename: '../_build/src/index.html'
 					})
+				];
+			}),
+			...includeWhen(args.customElement, (args: any) => {
+				return [
+					new webpack.optimize.CommonsChunkPlugin('widget-core', 'widget-core.js')
 				];
 			})
 		],
