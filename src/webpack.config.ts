@@ -78,7 +78,7 @@ module.exports = function (args: any) {
 				moduleIds: [ './request/xhr' ]
 			}),
 			new CoreLoadPlugin(),
-			new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false }, exclude: /tests[/]/ }),
+			/*new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false }, exclude: /tests[/]/ }),*/
 			...includeWhen(!args.customElement, (args: any) => {
 				return [
 					new HtmlWebpackPlugin ({
