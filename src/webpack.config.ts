@@ -56,17 +56,22 @@ module.exports = function (args: any) {
 				const factoryPath = args.customElement;
 				const factoryName = factoryPath.replace(/.*\//, '').replace(/\..*/, '');
 				return {
-					'widget-core': [ path.join(basePath, 'node_modules/@dojo/widgets/createWidgetBase') ],
-					[ factoryName ]: [ path.join(basePath, factoryPath) ]
+					'widget-core': [ path.join(basePath, 'src/createWidgetBase.ts') ],
+					/*'widget-core': [ path.join(basePath, 'node_modules/@dojo/widgets/createWidgetBase') ],*/
+					[ factoryName ]: [ path.join(basePath, 'registerCustomElement.js')]
 				};
 			})
 		},
 		plugins: [
 			new webpack.ContextReplacementPlugin(/dojo-app[\\\/]lib/, { test: () => false }),
 			new ExtractTextPlugin('main.css'),
-			new CopyWebpackPlugin([
-				{ context: 'src', from: '**/*', ignore: '*.ts' }
-			]),
+			...includeWhen(!args.customElement, (args: any) => {
+				return [
+					new CopyWebpackPlugin([
+						{ context: 'src', from: '**/*', ignore: '*.ts' }
+					])
+				];
+			}),
 			new webpack.optimize.DedupePlugin(),
 			new InjectModulesPlugin({
 				resourcePattern: /dojo-core\/request(\.js)?$/,
@@ -74,10 +79,14 @@ module.exports = function (args: any) {
 			}),
 			new CoreLoadPlugin(),
 			new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false }, exclude: /tests[/]/ }),
-			new HtmlWebpackPlugin ({
-				inject: true,
-				chunks: [ 'src/main' ],
-				template: 'src/index.html'
+			...includeWhen(!args.customElement, (args: any) => {
+				return [
+					new HtmlWebpackPlugin ({
+						inject: true,
+						chunks: [ 'src/main' ],
+						template: 'src/index.html'
+					})
+				];
 			}),
 			...includeWhen(args.locale, (args: any) => {
 				return [
@@ -151,6 +160,12 @@ module.exports = function (args: any) {
 				{ test: /src[\\\/].*\.css?$/, loader: cssModuleLoader },
 				{ test: /\.css$/, exclude: /src[\\\/].*/, loader: cssLoader },
 				{ test: /styles\/.*\.js$/, exclude: /src[\\\/].*/, loader: 'json-css-module-loader' },
+				...includeWhen(args.customElement, (args: any) => {
+					const factoryPath = args.customElement;
+					return [
+						{ test: /registerCustomElement\.js/, loader: `imports-loader?customElement=${factoryPath}` }
+					];
+				}),
 				...includeWhen(args.withTests, (args: any) => {
 					return [
 						{ test: /tests[\\\/].*\.ts?$/, loader: 'umd-compat-loader!ts-loader' }
