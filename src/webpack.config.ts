@@ -120,7 +120,13 @@ module.exports = function (args: any) {
 				];
 			}),
 			...includeWhen(args.customElement, (args: any) => {
+				const factoryPath = args.customElement;
+				const factoryName = factoryPath.replace(/.*\//, '').replace(/\..*/, '');
 				return [
+					new HtmlWebpackPlugin ({
+						filename: `${factoryName}.html`,
+						inject: true
+					}),
 					new webpack.optimize.CommonsChunkPlugin('widget-core', 'widget-core.js')
 				];
 			})
