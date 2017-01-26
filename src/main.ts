@@ -111,7 +111,8 @@ const command: Command = {
 
 		helper.yargs.option('c', {
 			alias: 'custom-element',
-			describe: 'build a custom element'
+			describe: 'build a custom element',
+			type: 'string'
 		});
 
 		return helper.yargs;

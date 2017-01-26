@@ -34,10 +34,14 @@ module.exports = function (args: any) {
 			}
 		],
 		entry: {
-			'src/main': [
-				path.join(basePath, 'src/main.css'),
-				path.join(basePath, 'src/main.ts')
-			],
+			...includeWhen(!args.customElement, (args: any) => {
+				return {
+					'src/main': [
+						path.join(basePath, 'src/main.css'),
+						path.join(basePath, 'src/main.ts')
+					]
+				};
+			}),
 			...includeWhen(args.withTests, (args: any) => {
 				return {
 					'../_build/tests/unit/all': [ path.join(basePath, 'tests/unit/all.ts') ],
@@ -49,8 +53,11 @@ module.exports = function (args: any) {
 				};
 			}),
 			...includeWhen(args.customElement, (args: any) => {
+				const factoryPath = args.customElement;
+				const factoryName = factoryPath.replace(/.*\//, '').replace(/\..*/, '');
 				return {
-					'widget-core': [ path.join(basePath, 'node_modules/@dojo/widgets/createWidgetBase') ]
+					'widget-core': [ path.join(basePath, 'node_modules/@dojo/widgets/createWidgetBase') ],
+					[ factoryName ]: [ path.join(basePath, factoryPath) ]
 				};
 			})
 		},
