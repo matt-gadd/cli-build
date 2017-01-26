@@ -56,14 +56,12 @@ module.exports = function (args: any) {
 				const factoryPath = args.customElement;
 				const factoryName = factoryPath.replace(/.*\//, '').replace(/\..*/, '');
 				return {
-					'widget-core': [ path.join(basePath, 'src/createWidgetBase.ts') ],
-					/*'widget-core': [ path.join(basePath, 'node_modules/@dojo/widgets/createWidgetBase') ],*/
+					'widget-core': [ path.join(basePath, 'node_modules/@dojo/widgets/createWidgetBase') ],
 					[ factoryName ]: [ path.join(basePath, 'registerCustomElement.js')]
 				};
 			})
 		},
 		plugins: [
-			new webpack.ContextReplacementPlugin(/dojo-app[\\\/]lib/, { test: () => false }),
 			new ExtractTextPlugin('main.css'),
 			...includeWhen(!args.customElement, (args: any) => {
 				return [
@@ -119,14 +117,17 @@ module.exports = function (args: any) {
 					})
 				];
 			}),
+			/* html imports */
 			...includeWhen(args.customElement, (args: any) => {
 				const factoryPath = args.customElement;
 				const factoryName = factoryPath.replace(/.*\//, '').replace(/\..*/, '');
+				/* we would want to inject our own empty template here so we don't get the extra default markup from the plugin */
 				return [
 					new HtmlWebpackPlugin ({
 						filename: `${factoryName}.html`,
 						inject: true
 					}),
+					/* split out the widget-core so we have a de-dupable runtime */
 					new webpack.optimize.CommonsChunkPlugin('widget-core', 'widget-core.js')
 				];
 			})
