@@ -29,22 +29,22 @@ try {
 type IncludeCallback = (args: BuildArgs) => any;
 
 interface UMDCompatOptions {
-	bundles?: {
+	chunks?: {
 		[key: string]: string[];
 	};
 }
 
 function getUMDCompatLoader(options: UMDCompatOptions) {
-	const { bundles = {} } = options;
+	const { chunks = {} } = options;
 	return {
 		loader: 'umd-compat-loader',
 		options: {
 			imports(module: string, context: string) {
 				const filePath = path.relative(basePath, path.join(context, module));
 				let chunkName = filePath;
-				Object.keys(bundles).some((bundleName) => {
-					if (bundles[bundleName].indexOf(filePath) > -1) {
-						chunkName = bundleName;
+				Object.keys(chunks).some((name) => {
+					if (chunks[name].indexOf(filePath) > -1) {
+						chunkName = name;
 						return true;
 					}
 					return false;
@@ -300,7 +300,7 @@ function webpackConfig(args: Partial<BuildArgs>) {
 				{ test: /src[\\\/].*\.ts?$/, enforce: 'pre', loader: 'css-module-dts-loader?type=ts&instanceName=0_dojo' },
 				{ test: /src[\\\/].*\.m\.css?$/, enforce: 'pre', loader: 'css-module-dts-loader?type=css' },
 				{ test: /src[\\\/].*\.ts(x)?$/, use: [
-					getUMDCompatLoader({ bundles: args.bundles }),
+					getUMDCompatLoader({ chunks: args.chunks }),
 					{
 						loader: 'ts-loader',
 						options: {
@@ -309,7 +309,7 @@ function webpackConfig(args: Partial<BuildArgs>) {
 					}
 				]},
 				{ test: new RegExp(`globalize(\\${path.sep}|$)`), loader: 'imports-loader?define=>false' },
-				{ test: /\.js?$/, use: [ getUMDCompatLoader({ bundles: args.bundles }) ] },
+				{ test: /\.js?$/, use: [ getUMDCompatLoader({ chunks: args.chunks }) ] },
 				...includeWhen(!args.element, () => {
 					return [
 						{ test: /\.html$/, loader: 'html-loader' }
@@ -322,7 +322,7 @@ function webpackConfig(args: Partial<BuildArgs>) {
 				...includeWhen(args.withTests, () => {
 					return [
 						{ test: /tests[\\\/].*\.ts?$/, use: [
-							getUMDCompatLoader({ bundles: args.bundles }),
+							getUMDCompatLoader({ chunks: args.chunks }),
 							{
 								loader: 'ts-loader',
 								options: {
