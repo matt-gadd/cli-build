@@ -27,6 +27,33 @@ try {
 
 type IncludeCallback = (args: BuildArgs) => any;
 
+interface UMDCompatOptions {
+	bundles?: {
+		[key: string]: string[];
+	};
+}
+
+function getUMDCompatLoader(options: UMDCompatOptions) {
+	const { bundles = {} } = options;
+	return {
+		loader: 'umd-compat-loader',
+		options: {
+			imports(module: string, context: string) {
+				const filePath = path.relative(basePath, path.join(context, module));
+				let chunkName = filePath;
+				Object.keys(bundles).some((bundleName) => {
+					if (bundles[bundleName].indexOf(filePath) > -1) {
+						chunkName = bundleName;
+						return true;
+					}
+					return false;
+				});
+				return `promise-loader?global,${chunkName}!${module}`;
+			}
+		}
+	};
+}
+
 function webpackConfig(args: Partial<BuildArgs>) {
 	args = args || {};
 
@@ -116,7 +143,6 @@ function webpackConfig(args: Partial<BuildArgs>) {
 					result.request = result.request.replace(/\.m\.css$/, '.m.css.js');
 				}
 			}),
-			new webpack.ContextReplacementPlugin(/dojo-app[\\\/]lib/, { test: () => false }),
 			includeWhen(args.element, args => {
 				return new ExtractTextPlugin({ filename: `${args.elementPrefix}.css` });
 			}, () => {
@@ -246,7 +272,7 @@ function webpackConfig(args: Partial<BuildArgs>) {
 				{ test: /src[\\\/].*\.ts?$/, enforce: 'pre', loader: 'css-module-dts-loader?type=ts&instanceName=0_dojo' },
 				{ test: /src[\\\/].*\.m\.css?$/, enforce: 'pre', loader: 'css-module-dts-loader?type=css' },
 				{ test: /src[\\\/].*\.ts(x)?$/, use: [
-					'umd-compat-loader',
+					getUMDCompatLoader({ bundles: args.bundles }),
 					{
 						loader: 'ts-loader',
 						options: {
@@ -254,8 +280,8 @@ function webpackConfig(args: Partial<BuildArgs>) {
 						}
 					}
 				]},
-				{ test: /\.js?$/, loader: 'umd-compat-loader' },
 				{ test: new RegExp(`globalize(\\${path.sep}|$)`), loader: 'imports-loader?define=>false' },
+				{ test: /\.js?$/, use: [ getUMDCompatLoader({ bundles: args.bundles }) ] },
 				...includeWhen(!args.element, () => {
 					return [
 						{ test: /\.html$/, loader: 'html-loader' }
@@ -268,7 +294,7 @@ function webpackConfig(args: Partial<BuildArgs>) {
 				...includeWhen(args.withTests, () => {
 					return [
 						{ test: /tests[\\\/].*\.ts?$/, use: [
-							'umd-compat-loader',
+							getUMDCompatLoader({ bundles: args.bundles }),
 							{
 								loader: 'ts-loader',
 								options: {
