@@ -15,8 +15,6 @@ const postcssCssNext = require('postcss-cssnext');
 
 const isCLI = process.env.DOJO_CLI;
 const packagePath = isCLI ? '.' : '@dojo/cli-build-webpack';
-const CoreLoadPlugin = require(`${packagePath}/plugins/CoreLoadPlugin`).default;
-const I18nPlugin = require(`${packagePath}/plugins/I18nPlugin`).default;
 const basePath = process.cwd();
 
 let tslintExists = false;
@@ -164,12 +162,6 @@ function webpackConfig(args: Partial<BuildArgs>) {
 					{ context: 'src', from: '**/*', ignore: '*.ts' }
 				]);
 			}),
-			new CoreLoadPlugin({
-				basePath,
-				detectLazyLoads: !args.disableLazyWidgetDetection,
-				ignoredModules,
-				mapAppModules: args.withTests
-			}),
 			...includeWhen(args.element, () => {
 				return [ new webpack.optimize.CommonsChunkPlugin({
 					name: 'widget-core',
@@ -195,17 +187,6 @@ function webpackConfig(args: Partial<BuildArgs>) {
 					chunks: [ 'src/main' ],
 					template: 'src/index.html'
 				});
-			}),
-			...includeWhen(args.locale, args => {
-				const { locale, messageBundles, supportedLocales, watch } = args;
-				return [
-					new I18nPlugin({
-						cacheCldrUrls: watch,
-						defaultLocale: locale,
-						supportedLocales,
-						messageBundles
-					})
-				];
 			}),
 			...includeWhen(!args.watch && !args.withTests, () => {
 				return [
@@ -308,25 +289,6 @@ function webpackConfig(args: Partial<BuildArgs>) {
 					return [
 						{ test: /custom-element\.js/, loader: `imports-loader?widgetFactory=${args.element}` }
 					];
-				}),
-				...includeWhen(args.bundles && Object.keys(args.bundles).length, () => {
-					const loaders: any[] = [];
-
-					Object.keys(args.bundles).forEach(bundleName => {
-						(args.bundles || {})[ bundleName ].forEach(fileName => {
-							loaders.push({
-								test: /main\.ts/,
-								loader: {
-									loader: 'imports-loader',
-									options: {
-										'__manual_bundle__': `bundle-loader?lazy&name=${bundleName}!${fileName}`
-									}
-								}
-							});
-						});
-					});
-
-					return loaders;
 				})
 			]
 		}
