@@ -15,7 +15,7 @@ export interface Bundles {
 export interface BuildArgs extends Argv {
 	locale: string;
 	messageBundles: string | string[];
-	supportedLocales: string | string[];
+	supportedLocales: string[];
 	watch: boolean;
 	port: number;
 	element: string;
