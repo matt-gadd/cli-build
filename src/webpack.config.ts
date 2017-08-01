@@ -54,8 +54,26 @@ function getUMDCompatLoader(options: UMDCompatOptions) {
 	};
 }
 
+function getLocales({ supportedLocales = [], locale = '' }: { supportedLocales?: string[], locale?: string }) {
+	return [ locale, ...supportedLocales ];
+}
+
+function getCLDRPaths(locales: string[], paths: string[]) {
+	const pathsObj = paths.reduce((obj, relativePath) => {
+		locales.forEach((locale) => {
+			const replacedPath = relativePath.replace('{locale}', locale);
+			obj[replacedPath] = true;
+		});
+		return obj;
+	}, {} as any);
+	return Object.keys(pathsObj);
+}
+
 function webpackConfig(args: Partial<BuildArgs>) {
 	args = args || {};
+
+	const locales = getLocales(args);
+	const paths = getCLDRPaths(locales, args.cldr);
 
 	const cssLoader = ExtractTextPlugin.extract({ use: 'css-loader?sourceMap!resolve-url-loader' });
 	const localIdentName = (args.watch || args.withTests) ? '[name]__[local]__[hash:base64:5]' : '[hash:base64:8]';
@@ -80,16 +98,6 @@ function webpackConfig(args: Partial<BuildArgs>) {
 
 	function includeWhen(predicate: any, callback: IncludeCallback, elseCallback: IncludeCallback | null = null) {
 		return predicate ? callback(args as any) : (elseCallback ? elseCallback(args as any) : []);
-	}
-
-	const ignoredModules: string[] = [];
-
-	if (args.bundles && Object.keys(args.bundles)) {
-		Object.keys(args.bundles).forEach(bundleName => {
-			(args.bundles || {})[bundleName].forEach(moduleName => {
-				ignoredModules.push(moduleName);
-			});
-		});
 	}
 
 	const config: webpack.Config = {
@@ -144,6 +152,9 @@ function webpackConfig(args: Partial<BuildArgs>) {
 		},
 		plugins: [
 			new AutoRequireWebpackPlugin(/src\/main/),
+			new (webpack as any).DefinePlugin({
+				'__cldrData__': JSON.stringify({ foo: 'bar' })
+			}),
 			new webpack.BannerPlugin(readFileSync(require.resolve(`${packagePath}/banner.md`), 'utf8')),
 			new IgnorePlugin(/request\/providers\/node/),
 			new NormalModuleReplacementPlugin(/\.m.css$/, result => {
@@ -325,6 +336,12 @@ function webpackConfig(args: Partial<BuildArgs>) {
 
 	if (args.debug) {
 		config.profile = true;
+	}
+
+	if (paths.length) {
+		/*const entry: any = (config as any).entry['src/main'];
+		entry.push(...paths);
+		console.log(entry);*/
 	}
 
 	return config;

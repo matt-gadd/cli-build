@@ -14,7 +14,7 @@ export interface Bundles {
 
 export interface BuildArgs {
 	messageBundles: string | string[];
-	supportedLocales: string | string[];
+	supportedLocales: string[];
 	watch: boolean;
 	port: number;
 	element: string;
