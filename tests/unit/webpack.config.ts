@@ -14,9 +14,7 @@ let mockModule: MockModule;
 function start(cli = true) {
 	mockModule = new MockModule('../../src/webpack.config');
 	mockModule.dependencies([
-		'./plugins/CoreLoadPlugin',
 		'./plugins/ExternalLoaderPlugin',
-		'./plugins/I18nPlugin',
 		'copy-webpack-plugin',
 		'extract-text-webpack-plugin',
 		'html-webpack-plugin',

@@ -52,9 +52,6 @@ export const loaderOptions = {
 		},
 		'src/plugins/InjectModulesPlugin': {
 			'webpack/lib': 'tests/support/webpack'
-		},
-		'src/plugins/I18nPlugin': {
-			'src/plugins/InjectModulesPlugin': 'tests/support/MockPlugin'
 		}
 	}
 };

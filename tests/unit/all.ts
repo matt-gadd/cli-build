@@ -1,12 +1,8 @@
 import './main';
 import './webpack.config';
 import './postcss.config';
-import './plugins/CoreLoadPlugin';
 import './plugins/ExternalLoaderPlugin';
-import './plugins/I18nPlugin';
 import './plugins/IgnoreUnmodifiedPlugin';
-import './plugins/InjectModulesPlugin';
-import './plugins/util/i18n';
 import './plugins/util/main';
 import './loaders/css-module-decorator-loader';
 import './loaders/css-module-dts-loader';
