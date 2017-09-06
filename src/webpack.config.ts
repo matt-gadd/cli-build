@@ -58,7 +58,7 @@ function getLocales({ supportedLocales = [], locale = '' }: { supportedLocales?:
 	return [ locale, ...supportedLocales ];
 }
 
-function getCLDRPaths(locales: string[], paths: string[]) {
+function getCLDRPaths(locales: string[] = [], paths: string[] = []) {
 	const pathsObj = paths.reduce((obj, relativePath) => {
 		locales.forEach((locale) => {
 			const replacedPath = relativePath.replace('{locale}', locale);
