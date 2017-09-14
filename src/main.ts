@@ -232,6 +232,18 @@ const command: Command<BuildArgs> = {
 	group: 'build',
 	name: 'webpack',
 	description: 'create a build of your application',
+	alias: [
+		{
+			name: 'dev',
+			description: 'create a dev server for your application',
+			options: [
+				{
+					option: 'watch',
+					value: true
+				}
+			]
+		}
+	],
 	register(options: OptionsHelper): void {
 		options('w', {
 			alias: 'watch',
